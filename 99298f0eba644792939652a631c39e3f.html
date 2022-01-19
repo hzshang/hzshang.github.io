@@ -29,7 +29,7 @@
   <meta property="og:title" content="操作系统-IDE控制器">
   
   
-    <meta property="og:image" content="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Fa8c0347c-750a-4c09-9937-743af45dcdc8%2F51J3C8VS52L._AC_.jpg?table=block&amp;id=99298f0e-ba64-4792-9396-52a631c39e3f">
+    <meta property="og:image" content="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;💾&lt;/text&gt;&lt;/svg&gt;">
   
   <style>
     .DateTagBar {
@@ -48,6 +48,8 @@
       <span>Home</span>
     </div>
   </a>
+  
+    
   
     
   
@@ -84,7 +86,7 @@
     </div>
     
       <div class="Header__Icon">
-        <span><img class="inline-img-icon" src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Fa8c0347c-750a-4c09-9937-743af45dcdc8%2F51J3C8VS52L._AC_.jpg?table=block&amp;id=99298f0e-ba64-4792-9396-52a631c39e3f"></span>
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;💾&lt;/text&gt;&lt;/svg&gt;"></span>
       </div>
     
     <h1 class="Header__Title">操作系统-IDE控制器</h1>
@@ -445,7 +447,7 @@
 	channels<span class="token punctuation">[</span>channel<span class="token punctuation">]</span><span class="token punctuation">.</span>nIEN <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
 	<span class="token function">ide_write</span><span class="token punctuation">(</span>channel<span class="token punctuation">,</span> ATA_REG_CONTROL<span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 	region_desc<span class="token operator">*</span> prd_table <span class="token operator">=</span> channels<span class="token punctuation">[</span>channel<span class="token punctuation">]</span><span class="token punctuation">.</span>prd_table<span class="token punctuation">;</span>
-	<span class="token function">memset</span><span class="token punctuation">(</span>channels<span class="token punctuation">[</span>channel<span class="token punctuation">]</span><span class="token punctuation">.</span>dma_buffer<span class="token punctuation">,</span><span class="token string">'\xcc'</span><span class="token punctuation">,</span>numsects<span class="token operator">*</span>words<span class="token operator">*</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token function">memset</span><span class="token punctuation">(</span>channels<span class="token punctuation">[</span>channel<span class="token punctuation">]</span><span class="token punctuation">.</span>dma_buffer<span class="token punctuation">,</span><span class="token char">'\xcc'</span><span class="token punctuation">,</span>numsects<span class="token operator">*</span>words<span class="token operator">*</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 	<span class="token comment">// prepare dma</span>
 	<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span>numsects<span class="token punctuation">;</span>i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
 		prd_table<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>address <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>channels<span class="token punctuation">[</span>channel<span class="token punctuation">]</span><span class="token punctuation">.</span>dma_buffer<span class="token punctuation">[</span>i<span class="token operator">*</span><span class="token number">2</span><span class="token operator">*</span>words<span class="token punctuation">]</span><span class="token punctuation">;</span>
